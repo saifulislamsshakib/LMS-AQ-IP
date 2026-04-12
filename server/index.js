@@ -6,6 +6,8 @@ import connectDB from "./database/db.js";
 import userRoute from "./routes/user.route.js";
 import courseRoute from "./routes/course.route.js";
 import mediaRoute from "./routes/media.route.js";
+import purchaseRoute from "./routes/purchaseCourse.route.js";
+import { stripeWebhook } from "./controllers/coursePurchase.controller.js";
 dotenv.config();
 
 //call database connection
@@ -13,6 +15,13 @@ connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// 🔥🔥 1. WEBHOOK ROUTE (MUST BE FIRST)
+app.post(
+  "/api/v1/purchase/webhook",
+  express.raw({ type: "application/json" }),
+  stripeWebhook,
+);
 
 //middleware
 app.use(express.json());
@@ -29,6 +38,7 @@ app.use(
 app.use("/api/v1/media", mediaRoute);
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/course", courseRoute);
+app.use("/api/v1/purchase", purchaseRoute);
 // app.get("/home", (_, res) => {
 //   res.status(200).json({
 //     success: true,

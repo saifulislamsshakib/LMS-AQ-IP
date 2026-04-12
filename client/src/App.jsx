@@ -3,9 +3,7 @@ import { Toaster } from "sonner";
 import Login from "./pages/login.jsx";
 import Navbar from "./components/ui/Navbar";
 import HeroSection from "./pages/student/HeroSection";
-import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "./layout/MainLayout";
-import { RouterProvider } from "react-router";
 import Courses from "./pages/student/Courses";
 import Mylearning from "./pages/student/Mylearning";
 import Profile from "./pages/student/Profile";
@@ -18,6 +16,10 @@ import EditCourse from "./pages/admin/course/EditCourse";
 import CreateLecture from "./pages/admin/lecture/createLecture";
 import EditLecture from "./pages/admin/lecture/EditLecture";
 import CourseDetail from "./pages/student/CourseDetail";
+import CoursePrograss from "./pages/student/CoursePrograss";
+
+// ✅ ONLY THIS ONE
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 // function App() {
 //   return (
@@ -56,6 +58,16 @@ const appRouter = createBrowserRouter([
         path: "course-detail/:courseId",
         element: <CourseDetail />,
       },
+      {
+        path: "course-progress/:courseId",
+        element: <CoursePrograss />,
+      },
+
+      // {
+      //   path: "course-prograss/:courseId",
+      //   element: <CoursePrograss />,
+      // },
+
       // admin routes starts
 
       // {
