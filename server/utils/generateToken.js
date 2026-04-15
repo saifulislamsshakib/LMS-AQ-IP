@@ -32,8 +32,8 @@ export const generateToken = (res, user, message) => {
   res
     .cookie("token", token, {
       httpOnly: true,
-      secure: false, // localhost এ false
-      sameSite: "lax", // 🔥 এটা important
+      secure: false, // 🔥 change here
+      sameSite: "lax", // 🔥 change here
       path: "/",
       maxAge: 24 * 60 * 60 * 1000,
     })

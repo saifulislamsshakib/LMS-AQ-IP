@@ -20,6 +20,13 @@ import CoursePrograss from "./pages/student/CoursePrograss";
 
 // ✅ ONLY THIS ONE
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import SearchPage from "./pages/student/SearchPage";
+import {
+  AdminRoute,
+  AuthenticatedUser,
+  ProtectedRoute,
+} from "./components/ui/ProtectedRoutes";
+import PurchaseCourseProtectedRoute from "./components/ui/PurchaseCourseProtectedRoute";
 
 // function App() {
 //   return (
@@ -44,23 +51,53 @@ const appRouter = createBrowserRouter([
       },
       {
         path: "login",
-        element: <Login />,
+        element: (
+          <AuthenticatedUser>
+            <Login />
+          </AuthenticatedUser>
+        ),
       },
       {
         path: "my-learning",
-        element: <Mylearning />,
+        element: (
+          <ProtectedRoute>
+            <Mylearning />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "profile",
-        element: <Profile />,
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "course/search",
+        element: (
+          <ProtectedRoute>
+            <SearchPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "course-detail/:courseId",
-        element: <CourseDetail />,
+        element: (
+          <ProtectedRoute>
+            <CourseDetail />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "course-progress/:courseId",
-        element: <CoursePrograss />,
+        element: (
+          <ProtectedRoute>
+            <PurchaseCourseProtectedRoute>
+              <CoursePrograss />
+            </PurchaseCourseProtectedRoute>
+          </ProtectedRoute>
+        ),
       },
 
       // {
@@ -83,7 +120,10 @@ const appRouter = createBrowserRouter([
         path: "admin",
         element: (
           <div className="flex min-h-screen">
-            <Sidebar />
+            <AdminRoute>
+              <Sidebar />
+            </AdminRoute>
+
             <div className="flex-1 p-5">
               <Outlet />
             </div>

@@ -103,7 +103,10 @@ const Navbar = () => {
                   <>
                     <DropdownMenuSeparator />
 
-                    <DropdownMenuItem>Dashboard</DropdownMenuItem>
+                    <DropdownMenuItem>
+                      {" "}
+                      <Link to="/admin/dashboard">Dashboard</Link>
+                    </DropdownMenuItem>
                   </>
                 )}
               </DropdownMenuContent>
@@ -116,7 +119,7 @@ const Navbar = () => {
               <Button onClick={() => navigate("/login")}>Signup</Button>
             </div>
           )}
-          <DarkMode />
+          {/* <DarkMode /> */}
         </div>
       </div>
       {/* mobile device */}

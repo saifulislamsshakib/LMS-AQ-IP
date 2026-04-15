@@ -21,10 +21,34 @@ export const courseApi = createApi({
       }),
       invalidatesTags: ["Refetch_Creator_Course"],
     }),
+    getSearchCourse: builder.query({
+      query: ({ searchQuery, categories, sortByPrice }) => {
+        //buid qierry string
+        let queryString = `/search?query=${encodeURIComponent(searchQuery)}`;
+        //append category
+        if (categories && categories.length > 0) {
+          const categoriesString = categories.map(encodeURIComponent).join(",");
+          queryString += `&categories=${categoriesString}`;
+        }
+
+        //append sort by price is available
+
+        if (sortByPrice) {
+          queryString += `&sortByPrice=${encodeURIComponent(sortByPrice)}`;
+        }
+
+        return {
+          url: queryString,
+          method: "GET",
+          credentials: "include",
+        };
+      },
+    }),
     getPublishedCourse: builder.query({
       query: () => ({
         url: "/published-courses",
         method: "GET",
+        credentials: "include", // 🔥 add this
       }),
     }),
 
@@ -102,6 +126,7 @@ export const courseApi = createApi({
 });
 export const {
   useCreateCourseMutation,
+  useGetSearchCourseQuery,
   useGetPublishedCourseQuery,
   useGetCreatorCoursesQuery,
   useEditCourseMutation,

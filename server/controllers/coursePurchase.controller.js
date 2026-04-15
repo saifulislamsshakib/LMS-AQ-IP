@@ -3,6 +3,7 @@ import { Course } from "../models/course.model.js";
 import { CoursePurchase } from "../models/coursePurchase.model.js";
 import { Lecture } from "../models/lecture.mode.js";
 import { User } from "../models/user.model.js";
+import { truncates } from "bcryptjs";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 export const createCheckoutSeesion = async (req, res) => {
   console.log("🔥 API HIT");
@@ -13,7 +14,6 @@ export const createCheckoutSeesion = async (req, res) => {
     const { courseId } = req.body;
 
     const course = await Course.findById(courseId);
-    if (!course) return res.status(404).json({ message: "Corse not found." });
 
     //create a new course purchase record
     // const newPurchase = new CoursePurchase({
@@ -48,7 +48,7 @@ export const createCheckoutSeesion = async (req, res) => {
         userId: userId,
       },
       shipping_address_collection: {
-        allowed_countries: ["IN"], //Optionally restrict allowed countries
+        allowed_countries: ["BD"], //Optionally restrict allowed countries
       },
     });
     const newPurchase = new CoursePurchase({
@@ -224,26 +224,63 @@ export const stripeWebhook = async (req, res) => {
 
 //adding
 
+// export const getCourseDetailWithStatus = async (req, res) => {
+//   try {
+//     const userId = req.id;
+//     const { courseId } = req.params;
+
+//     const purchase = await CoursePurchase.findOne({
+//       userId,
+//       courseId,
+//     });
+
+//     if (!purchase) {
+//       return res.status(404).json({
+//         purchased: false,
+//         message: "Course not purchased",
+//       });
+//     }
+
+//     return res.status(200).json({
+//       purchased: true,
+//       courseId,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+
 export const getCourseDetailWithStatus = async (req, res) => {
   try {
     const userId = req.id;
     const { courseId } = req.params;
 
-    const purchase = await CoursePurchase.findOne({
-      userId,
-      courseId,
-    });
+    // const course = await Course.findById(courseId);
+    const course = await Course.findById(courseId)
+      .populate("creator") // 🔥 MUST
+      .populate("lectures");
 
-    if (!purchase) {
-      return res.status(404).json({
-        purchased: false,
-        message: "Course not purchased",
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // ✅ creator হলে direct access
+    if (course.creator.toString() === userId.toString()) {
+      return res.status(200).json({
+        course,
+        purchased: true,
       });
     }
 
-    return res.status(200).json({
-      purchased: true,
+    const purchase = await CoursePurchase.findOne({
+      userId,
       courseId,
+      status: "completed",
+    });
+
+    return res.status(200).json({
+      course,
+      purchased: !!purchase,
     });
   } catch (error) {
     console.log(error);
@@ -260,6 +297,45 @@ export const getAllPurchasedCourses = async (req, res) => {
 
     res.status(200).json({
       purchasedCourses: purchases,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getCourseDetailWithPurchaseStatus = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const userId = req.id;
+    const course = await Course.findById(courseId)
+      .populate({ path: "creator" })
+      .populate({ path: "lectures" });
+
+    const purchased = await CoursePurchase.findOne({ userId, courseId });
+    if (!course) {
+      return res.status(404).json({ message: "course not found" });
+    }
+    return res.status(200).json({
+      course,
+      purchased: !!purchased,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getAllPurchasedCourse = async (_, res) => {
+  try {
+    const purchasedCourse = await CoursePurchase.find({
+      status: "completed",
+    }).populate("courseId");
+    if (!purchasedCourse) {
+      return res.status(404).json({
+        purchasedCourse: [],
+      });
+    }
+    return res.status(200).json({
+      purchasedCourse,
     });
   } catch (error) {
     console.log(error);

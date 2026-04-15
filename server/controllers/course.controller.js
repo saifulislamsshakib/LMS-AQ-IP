@@ -1,3 +1,4 @@
+import { populate } from "dotenv";
 import { Course } from "../models/course.model.js";
 import { Lecture } from "../models/lecture.mode.js";
 import {
@@ -30,27 +31,88 @@ export const createCourse = async (req, res) => {
   }
 };
 
+export const searchCourse = async (req, res) => {
+  try {
+    const { query = "", categories = [], sortByPrice = "" } = req.query;
+    //create search querry
+    const searchCriteria = {
+      isPublished: true,
+      $or: [
+        { courseTitle: { $regex: query, $options: "i" } },
+        { subTitle: { $regex: query, $options: "i" } },
+        { category: { $regex: query, $options: "i" } },
+      ],
+    };
+    // if categories selected
+    if (categories.length > 0) {
+      searchCriteria.category = { $in: categories };
+    }
+    //define sorting order
+    const sortOptions = {};
+    if (sortByPrice === "low") {
+      sortOptions.coursePrice = 1; //sort by proce in assending
+    } else if (sortByPrice === "high") {
+      sortOptions.coursePrice = -1; //desending
+    }
+    let courses = await Course.find(searchCriteria)
+      .populate({ path: "creator", select: "name photoUrl" })
+      .sort(sortOptions);
+    return res.status(200).json({
+      success: true,
+      courses: courses || [],
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Search failed",
+    });
+  }
+};
+
+// export const getPublishedCourse = async (_, res) => {
+//   try {
+//     const courses = await Course.find({ isPublished: true }).populate({
+//       path: "creator",
+//       select: "name photoUrl",
+//     });
+//     if (!courses) {
+//       return res.status(404).json({
+//         message: "Course not found",
+//       });
+//     }
+//     return res.status(200).json({
+//       courses,
+//     });
+//   } catch (error) {
+//     return res.status(404).json({
+//       courses: [],
+//       message: "Failed to get published courses..",
+//     });
+//   }
+// };
+
 export const getPublishedCourse = async (_, res) => {
   try {
     const courses = await Course.find({ isPublished: true }).populate({
       path: "creator",
       select: "name photoUrl",
     });
-    if (!courses) {
-      return res.status(404).json({
-        message: "Course not found",
-      });
-    }
+
+    console.log("PUBLISHED COURSES:", courses); // 👈 debug
+
     return res.status(200).json({
       courses,
     });
   } catch (error) {
-    return res.status(404).json({
+    console.log(error);
+    return res.status(500).json({
       courses: [],
       message: "Failed to get published courses..",
     });
   }
 };
+
 export const getCreatorCourses = async (req, res) => {
   try {
     const userId = req.id;

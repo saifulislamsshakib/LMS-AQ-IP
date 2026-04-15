@@ -11,13 +11,15 @@ import {
   getLectureById,
   togglePublishCourse,
   getPublishedCourse,
+  searchCourse,
 } from "../controllers/course.controller.js";
 import upload from "../utils/multer.js";
 import isAuthenticated from "../middlewares/isAuthenticated.js";
 
 const router = express.Router();
 router.route("/").post(isAuthenticated, createCourse);
-router.route("/published-courses").get(isAuthenticated, getPublishedCourse);
+router.route("/search").get(isAuthenticated, searchCourse);
+router.route("/published-courses").get(getPublishedCourse);
 router.route("/").get(isAuthenticated, getCreatorCourses);
 router
   .route("/:courseId")

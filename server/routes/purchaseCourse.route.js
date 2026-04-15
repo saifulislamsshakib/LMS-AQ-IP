@@ -2,6 +2,7 @@ import express from "express";
 import isAuthenticated from "../middlewares/isAuthenticated.js";
 import {
   createCheckoutSeesion,
+  getAllPurchasedCourse,
   getAllPurchasedCourses,
   getCourseDetailWithStatus,
   stripeWebhook,
@@ -19,5 +20,5 @@ router
   .route("/course/:courseId/detail-with-status")
   .get(isAuthenticated, getCourseDetailWithStatus);
 
-router.route("/").get(isAuthenticated, getAllPurchasedCourses);
+router.route("/").get(isAuthenticated, getAllPurchasedCourse);
 export default router;
