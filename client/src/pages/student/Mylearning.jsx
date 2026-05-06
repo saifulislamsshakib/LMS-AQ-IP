@@ -13,9 +13,8 @@ const Mylearning = () => {
   useEffect(() => {
     const fetchAttempts = async () => {
       try {
-        //"http://localhost:8080/api/v1/quiz/my-attempts"
         const res = await fetch(
-          `https://lms-aq-ip.onrender.com/api/v1/quiz/my-attempts`,
+          "http://localhost:8080/api/v1/quiz/my-attempts",
           {
             credentials: "include",
           },

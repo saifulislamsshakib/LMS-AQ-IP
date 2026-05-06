@@ -99,8 +99,8 @@ const CoursePrograss = () => {
       setScore(null);
 
       const res = await fetch(
-        // `http://localhost:8080/api/v1/quiz/generate/${courseId}`,
-        ` https://lms-aq-ip.onrender.com/api/v1/quiz/generate/${courseId}`,
+        `http://localhost:8080/api/v1/quiz/generate/${courseId}`,
+        // ` https://lms-aq-ip.onrender.com/api/v1/quiz/generate/${courseId}`,
         { credentials: "include" },
       );
 
@@ -131,8 +131,7 @@ const CoursePrograss = () => {
 
       setScore(correct);
 
-      // "http://localhost:8080/api/v1/quiz/submit"
-      await fetch(`https://lms-aq-ip.onrender.com/api/v1/quiz/submit`, {
+      await fetch("http://localhost:8080/api/v1/quiz/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
