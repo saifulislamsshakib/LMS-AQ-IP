@@ -29,8 +29,10 @@ export const createCheckoutSeesion = async (req, res) => {
       ],
       mode: "payment",
 
-      success_url: `http://localhost:5173/course-progress/${courseId}`,
-      cancel_url: `http://localhost:5173/course-detail/${courseId}`,
+      // success_url: `http://localhost:5173/course-progress/${courseId}`,
+      // cancel_url: `http://localhost:5173/course-detail/${courseId}`,
+      success_url: `https://lms-aq-ip.vercel.app/course-progress/${courseId}`,
+      cancel_url: `https://lms-aq-ip.vercel.app/course-detail/${courseId}`,
       metadata: {
         courseId: courseId,
         userId: userId,
