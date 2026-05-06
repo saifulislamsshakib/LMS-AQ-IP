@@ -14,10 +14,17 @@ export const authApi = createApi({
         url: "register",
         method: "POST",
         body: inputData,
-        credentials: "include", // 🔥 এটা add করো
+        credentials: "include",
       }),
     }),
-
+    changePassword: builder.mutation({
+      query: (data) => ({
+        url: "change-password",
+        method: "PUT",
+        body: data,
+        credentials: "include",
+      }),
+    }),
     loginUser: builder.mutation({
       query: (inputData) => ({
         url: "login",
@@ -51,7 +58,7 @@ export const authApi = createApi({
       query: () => ({
         url: "profile",
         method: "GET",
-        credentials: "include", // 🔥 important
+        credentials: "include",
       }),
       async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
@@ -72,6 +79,31 @@ export const authApi = createApi({
       }),
       invalidatesTags: ["User"],
     }),
+    getPendingTeachers: builder.query({
+      query: () => ({
+        url: "pending-teachers",
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["PendingTeachers"],
+    }),
+
+    approveTeacher: builder.mutation({
+      query: (id) => ({
+        url: `approve-teacher/${id}`,
+        method: "PUT",
+        credentials: "include",
+      }),
+      invalidatesTags: ["PendingTeachers"],
+    }),
+    rejectTeacher: builder.mutation({
+      query: (id) => ({
+        url: `reject-teacher/${id}`,
+        method: "DELETE",
+        credentials: "include",
+      }),
+      invalidatesTags: ["PendingTeachers"],
+    }),
   }),
 });
 export const {
@@ -80,4 +112,8 @@ export const {
   useLogoutUserMutation,
   useLoadUserQuery,
   useUpdateUserMutation,
+  useChangePasswordMutation,
+  useGetPendingTeachersQuery,
+  useApproveTeacherMutation,
+  useRejectTeacherMutation,
 } = authApi;

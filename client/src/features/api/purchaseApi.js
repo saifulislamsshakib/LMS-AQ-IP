@@ -31,10 +31,24 @@ export const purchaseApi = createApi({
         method: "GET",
       }),
     }),
+    getInstructorDashboard: builder.query({
+      query: () => ({
+        url: `/instructor/dashboard`,
+        method: "GET",
+      }),
+    }),
+    generateQuiz: builder.query({
+      query: (courseId) => ({
+        url: `/quiz/generate/${courseId}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 export const {
   useCreateCheckoutSessionMutation,
   useGetCourseDetailWithStatusQuery,
   useGetPurchasedCoursesQuery,
+  useGetInstructorDashboardQuery,
+  useGenerateQuizQuery,
 } = purchaseApi;

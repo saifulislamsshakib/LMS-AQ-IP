@@ -7,6 +7,7 @@ export const ProtectedRoute = ({ children }) => {
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
+
   return children;
 };
 
@@ -16,17 +17,30 @@ export const AuthenticatedUser = ({ children }) => {
   if (isAuthenticated) {
     return <Navigate to="/" />;
   }
+
   return children;
 };
 
 export const AdminRoute = ({ children }) => {
-  const { isAuthenticated } = useSelector((store) => store.auth);
+  const { isAuthenticated, user } = useSelector((store) => store.auth);
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
-  }
-  if (userLoggedIn.role !== "instructor") {
+  if (!isAuthenticated) return <Navigate to="/login" />;
+
+  if (user?.role !== "instructor" && user?.role !== "admin") {
     return <Navigate to="/" />;
   }
+
+  return children;
+};
+
+export const AdminOnlyRoute = ({ children }) => {
+  const { isAuthenticated, user } = useSelector((store) => store.auth);
+
+  if (!isAuthenticated) return <Navigate to="/login" />;
+
+  if (user?.role !== "admin") {
+    return <Navigate to="/" />;
+  }
+
   return children;
 };

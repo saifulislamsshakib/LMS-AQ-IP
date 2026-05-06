@@ -25,16 +25,30 @@ export const getCourseProgress = async (req, res) => {
           courseDetails,
           progress: [],
           completed: false,
+          progressPercentage: 0,
         },
       });
     }
     // retunr the users course progrss along with course detailes
+
+    const totalLectures = courseDetails.lectures.length;
+    const completedLectures = courseProgress.lectureProgress.filter(
+      (lec) => lec.viewed,
+    ).length;
+
+    const progressPercentage =
+      totalLectures === 0
+        ? 0
+        : Math.round((completedLectures / totalLectures) * 100);
 
     return res.status(200).json({
       data: {
         courseDetails,
         progress: courseProgress.lectureProgress,
         completed: courseProgress.completed,
+        progressPercentage,
+        lastLecture: courseProgress.lastLecture,
+        lastPosition: courseProgress.lastPosition,
       },
     });
   } catch (error) {
@@ -65,7 +79,7 @@ export const updateLectureProfress = async (req, res) => {
 
     //find the lecture progress in the cpurse progress
     const lectureIndex = courseProgress.lectureProgress.findIndex(
-      (lecture) => lecture.lectureId === lectureId,
+      (lecture) => lecture.lectureId.toString() === lectureId,
     );
 
     if (lectureIndex !== -1) {
@@ -85,7 +99,7 @@ export const updateLectureProfress = async (req, res) => {
     const course = await Course.findById(courseId);
     if (course.lectures.length === lectureProgressLength)
       courseProgress.completed = true;
-
+    courseProgress.lastLecture = lectureId;
     await courseProgress.save();
     return res.status(200).json({
       message: "Lecture progress updated successfully.",
@@ -130,5 +144,33 @@ export const markAsInCompleted = async (req, res) => {
     return res.status(200).json({ message: "course mark as incompleted" });
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const saveVideoProgress = async (req, res) => {
+  try {
+    const { courseId, lectureId, currentTime } = req.body;
+    const userId = req.id;
+
+    let progress = await CourseProgress.findOne({ courseId, userId });
+    if (!progress) {
+      progress = new CourseProgress({
+        userId,
+        courseId,
+        lectureProgress: [],
+      });
+    }
+
+    progress.lastLecture = lectureId;
+    progress.lastPosition = currentTime;
+
+    await progress.save();
+
+    return res.status(200).json({
+      message: "Progress saved",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server error" });
   }
 };

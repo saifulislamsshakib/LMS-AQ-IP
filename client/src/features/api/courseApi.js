@@ -17,21 +17,18 @@ export const courseApi = createApi({
         url: "",
         method: "POST",
         body: { courseTitle, category },
-        credentials: "include", // 🔥 এটা add করো
+        credentials: "include",
       }),
       invalidatesTags: ["Refetch_Creator_Course"],
     }),
     getSearchCourse: builder.query({
       query: ({ searchQuery, categories, sortByPrice }) => {
-        //buid qierry string
         let queryString = `/search?query=${encodeURIComponent(searchQuery)}`;
-        //append category
+
         if (categories && categories.length > 0) {
           const categoriesString = categories.map(encodeURIComponent).join(",");
           queryString += `&categories=${categoriesString}`;
         }
-
-        //append sort by price is available
 
         if (sortByPrice) {
           queryString += `&sortByPrice=${encodeURIComponent(sortByPrice)}`;
@@ -48,7 +45,7 @@ export const courseApi = createApi({
       query: () => ({
         url: "/published-courses",
         method: "GET",
-        credentials: "include", // 🔥 add this
+        credentials: "include",
       }),
     }),
 
@@ -56,7 +53,7 @@ export const courseApi = createApi({
       query: () => ({
         url: "",
         method: "GET",
-        credentials: "include", // 🔥 এটা add করো
+        credentials: "include",
       }),
       providesTags: ["Refetch_Creator_Course"],
     }),
@@ -122,6 +119,19 @@ export const courseApi = createApi({
       }),
       invalidatesTags: ["Refetch_Creator_Course"],
     }),
+    getCourseStudents: builder.query({
+      query: (courseId) => ({
+        url: `/${courseId}/students`,
+        method: "GET",
+      }),
+    }),
+
+    removeStudent: builder.mutation({
+      query: ({ courseId, studentId }) => ({
+        url: `/${courseId}/remove-student/${studentId}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 export const {
@@ -137,4 +147,6 @@ export const {
   useRemoveLectureMutation,
   useGetLectureByIdQuery,
   usePublishCourseMutation,
+  useGetCourseStudentsQuery,
+  useRemoveStudentMutation,
 } = courseApi;

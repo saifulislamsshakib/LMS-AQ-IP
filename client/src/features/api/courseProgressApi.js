@@ -3,39 +3,6 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 
 const COURSE_PROGRESS_API = "http://localhost:8080/api/v1/progress";
 
-// export const courseProgressApi = createApi({
-//   reducerPath: "courseProgressApi",
-//   baseQuery: fetchBaseQuery({
-//     baseUrl: COURSE_PROGRESS_API,
-//     credentials: "include",
-//   }),
-//   endpoints: (builder) => ({
-//     getCourseProgrss: builder.query({
-//       query: (courseId) => ({
-//         url: `/${courseId}`,
-//         method: "GET",
-//       }),
-//     }),
-//     updateLectureProgress: builder.mutation({
-//       query: ({ courseId, lectureId }) => ({
-//         url: `/${courseId}/lecture/${lectureId}/view`,
-//         method: "POST",
-//       }),
-//     }),
-//     completeCourse: builder.mutation({
-//       query: (courseId) => ({
-//         url: `/${courseId}/complete`,
-//         method: "POST",
-//       }),
-//     }),
-//     inCompleteCourse: builder.mutation({
-//       query: (courseId) => ({
-//         url: `/${courseId}/incomplete`,
-//         method: "POST",
-//       }),
-//     }),
-//   }),
-// });
 export const courseProgressApi = createApi({
   reducerPath: "courseProgressApi",
   baseQuery: fetchBaseQuery({
@@ -43,40 +10,45 @@ export const courseProgressApi = createApi({
     credentials: "include",
   }),
 
-  tagTypes: ["CourseProgress"], // 🔥 important
+  tagTypes: ["CourseProgress"],
 
   endpoints: (builder) => ({
-    // 📌 Get course progress
     getCourseProgrss: builder.query({
       query: (courseId) => `/${courseId}`,
-      providesTags: ["CourseProgress"], // 🔥
+      providesTags: (result, error, courseId) => [
+        { type: "CourseProgress", id: courseId },
+      ],
     }),
 
-    // 📌 Update lecture progress (video play)
     updateLectureProgress: builder.mutation({
       query: ({ courseId, lectureId }) => ({
         url: `/${courseId}/lecture/${lectureId}/view`,
         method: "POST",
       }),
-      invalidatesTags: ["CourseProgress"], // 🔥 auto refetch
+      invalidatesTags: ["CourseProgress"],
     }),
 
-    // 📌 Mark course as completed
     completeCourse: builder.mutation({
       query: (courseId) => ({
         url: `/${courseId}/complete`,
         method: "POST",
       }),
-      invalidatesTags: ["CourseProgress"], // 🔥 auto update UI
+      invalidatesTags: ["CourseProgress"],
     }),
 
-    // 📌 Mark course as incomplete
     inCompleteCourse: builder.mutation({
       query: (courseId) => ({
         url: `/${courseId}/incomplete`,
         method: "POST",
       }),
-      invalidatesTags: ["CourseProgress"], // 🔥
+      invalidatesTags: ["CourseProgress"],
+    }),
+    saveVideoProgress: builder.mutation({
+      query: (body) => ({
+        url: "/save-progress",
+        method: "POST",
+        body,
+      }),
     }),
   }),
 });
@@ -85,4 +57,5 @@ export const {
   useUpdateLectureProgressMutation,
   useCompleteCourseMutation,
   useInCompleteCourseMutation,
+  useSaveVideoProgressMutation,
 } = courseProgressApi;

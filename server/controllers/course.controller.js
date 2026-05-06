@@ -6,6 +6,7 @@ import {
   deleteVideoFromCloudinary,
   uploadMedia,
 } from "../utils/cloudinary.js";
+import { User } from "../models/user.model.js";
 export const createCourse = async (req, res) => {
   try {
     const { courseTitle, category } = req.body;
@@ -19,6 +20,10 @@ export const createCourse = async (req, res) => {
       category,
       creator: req.id,
     });
+    await User.findByIdAndUpdate(req.id, {
+      $push: { createdCourses: course._id },
+    });
+
     return res.status(201).json({
       course,
       message: "Course created",
@@ -70,36 +75,12 @@ export const searchCourse = async (req, res) => {
   }
 };
 
-// export const getPublishedCourse = async (_, res) => {
-//   try {
-//     const courses = await Course.find({ isPublished: true }).populate({
-//       path: "creator",
-//       select: "name photoUrl",
-//     });
-//     if (!courses) {
-//       return res.status(404).json({
-//         message: "Course not found",
-//       });
-//     }
-//     return res.status(200).json({
-//       courses,
-//     });
-//   } catch (error) {
-//     return res.status(404).json({
-//       courses: [],
-//       message: "Failed to get published courses..",
-//     });
-//   }
-// };
-
 export const getPublishedCourse = async (_, res) => {
   try {
     const courses = await Course.find({ isPublished: true }).populate({
       path: "creator",
       select: "name photoUrl",
     });
-
-    console.log("PUBLISHED COURSES:", courses); // 👈 debug
 
     return res.status(200).json({
       courses,
@@ -272,8 +253,10 @@ export const editLecture = async (req, res) => {
     }
     //update lecture
     if (lectureTitle) lecture.lectureTitle = lectureTitle;
-    if (videoInfo?.videoUrl) lecture.videoUrl = videoInfo.videoUrl;
-    if (videoInfo?.publicId) lecture.publicId = videoInfo.publicId;
+    if (videoInfo && videoInfo.videoUrl) {
+      lecture.videoUrl = videoInfo.videoUrl;
+      lecture.publicId = videoInfo.publicId;
+    }
     // if (isPreviewFree) lecture.isPreviewFree = isPreviewFree;
     lecture.isPreviewFree = isPreviewFree;
 
@@ -372,6 +355,49 @@ export const togglePublishCourse = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       message: "Failed to update ststus.",
+    });
+  }
+};
+
+export const getCourseStudents = async (req, res) => {
+  try {
+    const { courseId } = req.params;
+
+    const course = await Course.findById(courseId).populate(
+      "enrolledStudents",
+      "name email",
+    );
+
+    return res.status(200).json({
+      success: true,
+      students: course.enrolledStudents,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to fetch students",
+    });
+  }
+};
+
+export const removeStudentFromCourse = async (req, res) => {
+  try {
+    const { courseId, studentId } = req.params;
+
+    await Course.findByIdAndUpdate(courseId, {
+      $pull: { enrolledStudents: studentId },
+    });
+
+    await User.findByIdAndUpdate(studentId, {
+      $pull: { enrolledCourses: courseId },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Student removed",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to remove student",
     });
   }
 };

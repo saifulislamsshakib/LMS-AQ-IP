@@ -22,17 +22,6 @@ const HeroSection = () => {
         <p className="text-gray-200 dark:text-gray-400 mb-8">
           Discover, Learn and Upskill with our wide range of courses
         </p>
-        {/* <form action="" className="">
-          <Input
-            type="text"
-            className="flex-grow bg-white border-none focus-visible:ring-0 px-6 py-3  dark:text-gray-100 rounded-full shadow-lg overflow-hidden max-w-xl mx-auto mb-6"
-          />
-          <Button className="bg-blue-600 dark:bg-blue-700 text-white px-6 py-3 rounded-r-full hover:bg-blue-700 dark:hover:bg-blue-800">
-            Search
-          </Button>
-        </form> */}
-
-        {/* uporer tao hobe. */}
 
         <form onSubmit={searchHandler} className="flex justify-center">
           <div className="flex items-center bg-white rounded-full shadow-lg overflow-hidden max-w-xl w-full">

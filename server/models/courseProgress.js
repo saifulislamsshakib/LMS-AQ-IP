@@ -1,16 +1,37 @@
 import mongoose from "mongoose";
 
 const lectureProgressSchema = new mongoose.Schema({
-  lectureId: { type: String },
+  lectureId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Lecture",
+  },
   viewed: { type: Boolean },
 });
 
 const courseProgressSchema = new mongoose.Schema({
-  userId: { type: String },
-  courseId: { type: String },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+  courseId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Course",
+  },
   completed: { type: Boolean },
+
   lectureProgress: [lectureProgressSchema],
+
+  lastLecture: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Lecture",
+  },
+
+  lastPosition: {
+    type: Number,
+    default: 0,
+  },
 });
+
 export const CourseProgress = mongoose.model(
   "CourseProgress",
   courseProgressSchema,

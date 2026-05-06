@@ -12,6 +12,8 @@ import {
   togglePublishCourse,
   getPublishedCourse,
   searchCourse,
+  getCourseStudents,
+  removeStudentFromCourse,
 } from "../controllers/course.controller.js";
 import upload from "../utils/multer.js";
 import isAuthenticated from "../middlewares/isAuthenticated.js";
@@ -34,4 +36,11 @@ router
 router.route("/lecture/:lectureId").delete(isAuthenticated, removeLecture);
 router.route("/lecture/:lectureId").get(isAuthenticated, getLectureById);
 router.route("/:courseId").patch(isAuthenticated, togglePublishCourse);
+router.get("/:courseId/students", isAuthenticated, getCourseStudents);
+
+router.delete(
+  "/:courseId/remove-student/:studentId",
+  isAuthenticated,
+  removeStudentFromCourse,
+);
 export default router;

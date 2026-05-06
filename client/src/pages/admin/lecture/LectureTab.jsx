@@ -40,7 +40,10 @@ const LectureTab = () => {
       setLectureTitle(lecture.lectureTitle);
       // setIsFree(lecture.isFree);
       setIsFree(lecture.isPreviewFree);
-      setUploadVideoInfo(lecture.videoInfo);
+      setUploadVideoInfo({
+        videoUrl: lecture.videoUrl,
+        publicId: lecture.publicId,
+      });
     }
   }, [lecture]);
   const [editLecture, { data, isLoading, error, isSuccess }] =
@@ -58,16 +61,24 @@ const LectureTab = () => {
       try {
         const res = await axios.post(`${MEDIA_API}/upload-video`, formData, {
           onUploadProgress: ({ loaded, total }) => {
-            setUploadProgress(Math.round(loaded * 100) / total);
+            setUploadProgress(Math.round((loaded * 100) / total));
           },
         });
+        // 🔥 ADD THESE 3 LINES HERE
+        console.log("UPLOAD RESPONSE FULL:", res);
+        console.log("UPLOAD DATA:", res.data);
+        console.log("UPLOAD DATA.DATA:", res.data.data);
 
-        if (res.data.success) {
-          console.log(res);
-          setUploadVideoInfo({
-            videoUrl: res.data.data.url,
-            publicId: res.data.data.public_id,
-          });
+        if (res.data) {
+          const videoData = {
+            videoUrl: res.data.data.videoUrl,
+            publicId: res.data.data.publicId,
+          };
+
+          console.log("FINAL VIDEO DATA:", videoData); // ✅ IMPORTANT
+
+          setUploadVideoInfo(videoData);
+
           setBtnDisable(false);
           toast.success(res.data.message);
         }
@@ -81,7 +92,11 @@ const LectureTab = () => {
   };
 
   const editLectureHandler = async () => {
-    console.log({ lectureTitle, uploadVideoInfo, isFree, courseId, lectureId });
+    console.log("SENDING DATA:", {
+      lectureTitle,
+      videoInfo: uploadVideoInfo,
+      isFree,
+    });
 
     await editLecture({
       lectureTitle,
@@ -180,7 +195,12 @@ const LectureTab = () => {
           <Button className="justify-start">Updates Lecture</Button>
         </div> */}
         <div className="mt-4 flex justify-start">
-          <Button onClick={editLectureHandler}>Update Lecture</Button>
+          <Button
+            onClick={editLectureHandler}
+            disabled={!uploadVideoInfo?.videoUrl}
+          >
+            Update Lecture
+          </Button>
         </div>
       </CardContent>
     </Card>

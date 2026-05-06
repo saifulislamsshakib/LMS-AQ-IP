@@ -32,8 +32,16 @@ import { useLoginUserMutation } from "@/features/api/authApi";
 import { useLogoutUserMutation } from "@/features/api/authApi";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { userLoggedOut } from "@/features/authSlice";
+import { useLoadUserQuery } from "@/features/api/authApi";
+
 const Navbar = () => {
+  const dispatch = useDispatch();
   const { user } = useSelector((store) => store.auth);
+  useLoadUserQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const [logoutUser, { data, isSuccess }] = useLogoutUserMutation();
   const navigate = useNavigate();
   const logoutHandler = async () => {
@@ -43,36 +51,23 @@ const Navbar = () => {
   useEffect(() => {
     if (isSuccess) {
       toast.success(data.message || "User log out");
+      dispatch(userLoggedOut());
       navigate("/login");
     }
   }, [isSuccess]);
   return (
     <div className=" h-16 dark:bg-[#0A0A0A] bg-white border-b dark:border-b-gray-800 border-b-gray-200 fixed top-0 left-0 right-0 duration-300 z-10">
       <div className="max-w-7xl mx-auto hidden md:flex justify-between items-center gap-10 h-full">
-        {/* <div className="w-full px-5 hidden md:flex justify-between items-center gap-10 h-full"> */}
-        {/* <div className="w-full px-6 lg:px-10 hidden md:flex justify-between items-center h-full"> */}
         <div className="flex items-center gap-2">
           <School size={30} />
           <Link to="/">
             <h1 className="font-extrabold text-2xl">E-learning</h1>
           </Link>
         </div>
-        {/* user icon and dark icon */}
+
         <div className="flex items-center gap-8">
           {user ? (
             <DropdownMenu>
-              {/* <DropdownMenuTrigger asChild>
-                
-                <Avatar>
-                  <AvatarImage
-                    src={user?.photoUrl || "https://github.com/shadcn.png"}
-                    alt="@shadcn"
-                    className="grayscale"
-                  />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger> */}
-
               <DropdownMenuTrigger asChild>
                 <button>
                   <Avatar>
@@ -87,28 +82,45 @@ const Navbar = () => {
                 <DropdownMenuGroup>
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuItem>
-                    <Link to="my-learning">My Learning</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
                     <Link to="profile">Edit Profile</Link>
                   </DropdownMenuItem>
+                  {user?.role === "student" && (
+                    <>
+                      <DropdownMenuItem>
+                        <Link to="my-learning">My Learning</Link>
+                      </DropdownMenuItem>
+
+                      {/* <DropdownMenuItem>
+                        <Link to="/interview-prep">Interview Preparation</Link>
+                      </DropdownMenuItem> */}
+                      {user?.enrolledCourses?.length > 0 && (
+                        <DropdownMenuItem>
+                          <Link to="/interview-prep">
+                            Interview Preparation
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                    </>
+                  )}
                 </DropdownMenuGroup>
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem onClick={logoutHandler}>
-                  Log out
-                </DropdownMenuItem>
-                {user.role === "instructor" && (
+                {(user?.role === "instructor" || user?.role === "admin") && (
                   <>
                     <DropdownMenuSeparator />
 
                     <DropdownMenuItem>
-                      {" "}
                       <Link to="/admin/dashboard">Dashboard</Link>
                     </DropdownMenuItem>
                   </>
                 )}
+                <DropdownMenuItem>
+                  <Link to="/change-password">Change Password</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={logoutHandler}>
+                  Log out
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
@@ -119,10 +131,8 @@ const Navbar = () => {
               <Button onClick={() => navigate("/login")}>Signup</Button>
             </div>
           )}
-          {/* <DarkMode /> */}
         </div>
       </div>
-      {/* mobile device */}
 
       <div className="flex md:hidden items-center justify-between px-4 h-full">
         <h1 className="font-extrabold text-2xl">E-learning</h1>

@@ -5,6 +5,7 @@ import {
   getAllPurchasedCourse,
   getAllPurchasedCourses,
   getCourseDetailWithStatus,
+  getInstructorDashboard,
   stripeWebhook,
 } from "../controllers/coursePurchase.controller.js";
 
@@ -20,5 +21,9 @@ router
   .route("/course/:courseId/detail-with-status")
   .get(isAuthenticated, getCourseDetailWithStatus);
 
-router.route("/").get(isAuthenticated, getAllPurchasedCourse);
+// router.route("/").get(isAuthenticated, getAllPurchasedCourse);
+router.route("/").get(isAuthenticated, getAllPurchasedCourses);
+router
+  .route("/instructor/dashboard")
+  .get(isAuthenticated, getInstructorDashboard);
 export default router;

@@ -16,16 +16,20 @@ import { useNavigate, useParams } from "react-router-dom";
 import ReactPlayer from "react-player";
 
 const CourseDetail = () => {
-  const params = useParams();
-  const courseId = params.courseId;
+  const { courseId } = useParams();
   const navigate = useNavigate();
+
   const { data, isLoading, isError } =
     useGetCourseDetailWithStatusQuery(courseId);
 
-  if (isLoading) return <h1>Loading....</h1>;
-  if (isError || !data) return <h1>Failed to load course details..</h1>;
+  if (isLoading) return <h1 className="text-center mt-20">Loading...</h1>;
+  if (isError || !data)
+    return <h1 className="text-center mt-20">Failed to load course</h1>;
 
   const { course, purchased } = data;
+
+  const lectures = course?.lectures || [];
+  const firstLecture = lectures[0];
 
   const handleContinueCourse = () => {
     if (purchased) {
@@ -36,68 +40,88 @@ const CourseDetail = () => {
   return (
     <div className="mt-24">
       <div className="bg-[#2D2F31] text-white">
-        {/* <div className="max-w-7xl mx-auto py-8 md:px-8 flex flex-col gap-2"> */}
         <div className="max-w-7xl ml-auto py-8 md:px-8 flex flex-col gap-2 text-left">
           <h1 className="font-bold text-2xl md:text-3xl">
             {course?.courseTitle}
           </h1>
+
           <p className="text-base md:text-lg">{course?.courseSubtitle}</p>
+
           <p>
-            Created By {""}{" "}
+            Created By{" "}
             <span className="text-[#C0C4FC] underline italic">
-              {course?.creator?.name}
+              {course?.creator?.name || "Unknown"}
             </span>
           </p>
+
           <div className="flex items-center gap-2 text-sm">
             <BadgeInfo size={16} />
-            <p>Last Updated {course?.createdAt?.split("T")[0]}</p>
+            <p>Last Updated {course?.createdAt?.split("T")[0] || "N/A"}</p>
           </div>
-          <p>Student enrolled: {course?.enrolledStudents?.length}</p>
+
+          <p>Student enrolled: {course?.enrolledStudents?.length || 0}</p>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto my-5 px-4 md:px-8 flex flex-col lg:flex-row justify-between gap-10">
+
+      <div className="max-w-7xl mx-auto my-5 px-4 md:px-8 flex flex-col lg:flex-row gap-10">
         <div className="w-full lg:w-1/2 space-y-5">
           <h1 className="font-bold text-xl md:text-2xl">Description</h1>
-          {/* <p className="text-sm">
-            {course?.description}
-          </p> */}
+
           <p
             className="text-sm"
-            dangerouslySetInnerHTML={{ __html: course.description }}
+            dangerouslySetInnerHTML={{
+              __html: course?.description || "",
+            }}
           />
+
           <Card>
             <CardHeader>
               <CardTitle>Course Content</CardTitle>
-              <CardDescription>4 lecture</CardDescription>
+              <CardDescription>{lectures.length} lectures</CardDescription>
             </CardHeader>
+
             <CardContent className="space-y-3">
-              {course.lectures.map((lecture, idx) => (
-                <div key={idx} className="flex items-center gap-3 text-sm">
-                  <span>
-                    {true ? <PlayCircle size={14} /> : <Lock size={14} />}
-                  </span>
-                  <p>{lecture.lectureTitle}</p>
-                </div>
-              ))}
+              {lectures.length > 0 ? (
+                lectures.map((lecture, idx) => (
+                  <div key={idx} className="flex items-center gap-3 text-sm">
+                    <PlayCircle size={14} />
+                    <p>{lecture?.lectureTitle}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm">No lectures available</p>
+              )}
             </CardContent>
           </Card>
         </div>
+
         <div className="w-full lg:w-1/3">
           <Card>
             <CardContent className="p-4 flex flex-col">
-              {/* <div className="w-full aspect-video mb-4">Video asbe</div> */}
               <div className="w-full aspect-video mb-4 bg-gray-200 flex items-center justify-center">
-                <ReactPlayer
-                  width="100%"
-                  height={"100%"}
-                  url={course.lectures[0].videoUrl}
-                  controls={true}
-                />
+                {firstLecture?.videoUrl ? (
+                  <ReactPlayer
+                    width="100%"
+                    height="100%"
+                    url={firstLecture.videoUrl}
+                    controls
+                  />
+                ) : (
+                  <p className="text-gray-500 text-sm">
+                    No preview video available
+                  </p>
+                )}
               </div>
-              <h1>Lecture Title</h1>
+
+              <h1 className="text-sm text-gray-600">
+                {firstLecture?.lectureTitle || "No lecture selected"}
+              </h1>
+
               <Separator className="my-2" />
+
               <h1 className="text-lg md:text-xl font-semibold">Course Price</h1>
             </CardContent>
+
             <CardFooter className="flex justify-center p-4">
               {purchased ? (
                 <Button onClick={handleContinueCourse} className="w-full">

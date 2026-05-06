@@ -1,12 +1,14 @@
 import "./App.css";
 import { Toaster } from "sonner";
 import Login from "./pages/login.jsx";
+
 import Navbar from "./components/ui/Navbar";
 import HeroSection from "./pages/student/HeroSection";
 import MainLayout from "./layout/MainLayout";
 import Courses from "./pages/student/Courses";
 import Mylearning from "./pages/student/Mylearning";
 import Profile from "./pages/student/Profile";
+import ChangePassword from "./pages/ChangePassword";
 import Sidebar from "./pages/admin/lecture/Sidebar";
 import Dashboard from "./pages/admin/lecture/Dashboard";
 import CourseTable from "./pages/admin/course/CourseTable";
@@ -17,8 +19,8 @@ import CreateLecture from "./pages/admin/lecture/createLecture";
 import EditLecture from "./pages/admin/lecture/EditLecture";
 import CourseDetail from "./pages/student/CourseDetail";
 import CoursePrograss from "./pages/student/CoursePrograss";
+import InterviewPrep from "./pages/student/InterviewPrep";
 
-// ✅ ONLY THIS ONE
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import SearchPage from "./pages/student/SearchPage";
 import {
@@ -27,14 +29,9 @@ import {
   ProtectedRoute,
 } from "./components/ui/ProtectedRoutes";
 import PurchaseCourseProtectedRoute from "./components/ui/PurchaseCourseProtectedRoute";
+import PendingTeachers from "./pages/admin/PendingTeachers";
+import { AdminOnlyRoute } from "./components/ui/ProtectedRoutes";
 
-// function App() {
-//   return (
-//     <main>
-//       <Login />
-//     </main>
-//   );
-// }
 const appRouter = createBrowserRouter([
   {
     path: "/",
@@ -57,6 +54,7 @@ const appRouter = createBrowserRouter([
           </AuthenticatedUser>
         ),
       },
+
       {
         path: "my-learning",
         element: (
@@ -70,6 +68,22 @@ const appRouter = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "change-password",
+        element: (
+          <ProtectedRoute>
+            <ChangePassword />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "interview-prep",
+        element: (
+          <ProtectedRoute>
+            <InterviewPrep />
           </ProtectedRoute>
         ),
       },
@@ -131,6 +145,7 @@ const appRouter = createBrowserRouter([
         ),
         children: [
           { path: "dashboard", element: <Dashboard /> },
+
           { path: "course", element: <CourseTable /> },
           { path: "course/create", element: <AddCourse /> },
           { path: "course/:courseId", element: <EditCourse /> },
@@ -138,6 +153,14 @@ const appRouter = createBrowserRouter([
           {
             path: "course/:courseId/lecture/:lectureId",
             element: <EditLecture />,
+          },
+          {
+            path: "pending-teachers",
+            element: (
+              <AdminOnlyRoute>
+                <PendingTeachers />
+              </AdminOnlyRoute>
+            ),
           },
         ],
       },
@@ -147,12 +170,6 @@ const appRouter = createBrowserRouter([
 
 function App() {
   return (
-    // <>
-    //   <Navbar />
-    //   <HeroSection />
-    //   <Login />
-    //   <Toaster />
-    // </>
     <main>
       <RouterProvider router={appRouter} />
     </main>

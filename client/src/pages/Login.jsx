@@ -23,11 +23,17 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
+import { useDispatch } from "react-redux";
+import { userLoggedIn } from "@/features/authSlice";
+import { useLoadUserQuery } from "@/features/api/authApi";
+
 const Login = () => {
+  const dispatch = useDispatch();
   const [signupInput, setSignupInput] = useState({
     name: "",
     email: "",
     password: "",
+    role: "student",
   });
   const [loginInput, setLoginInput] = useState({
     email: "",
@@ -55,30 +61,6 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   if (registerIsSuccess && registerData) {
-  //     toast.success(registerData.message || "Signup Successfully");
-  //   }
-
-  //   if (registerError) {
-  //     toast.error(registerError?.data?.message || "Signup failed");
-  //   }
-
-  //   if (loginIsSuccess && loginrData) {
-  //     toast.success(loginrData.message || "Login Successfully");
-  //   }
-  //   if (loginError) {
-  //     toast.error(loginError?.data?.message || "Login failed");
-  //   }
-  // }, [
-  //   loginIsSuccess,
-  //   registerIsSuccess,
-  //   loginrData,
-  //   registerData,
-  //   loginError,
-  //   registerError,
-  // ]);
-
   useEffect(() => {
     if (registerIsSuccess) {
       toast.success(registerData?.message || "Signup Successfully");
@@ -90,6 +72,9 @@ const Login = () => {
 
     if (loginIsSuccess) {
       toast.success(loginrData?.message || "Login Successfully");
+
+      dispatch(userLoggedIn({ user: loginrData.user }));
+      refetch();
       navigate("/");
     }
 
@@ -175,7 +160,25 @@ const Login = () => {
                   autoComplete="off"
                 />
               </div>
+              <div className="space-y-1">
+                <Label>Select Role</Label>
 
+                <select
+                  name="role"
+                  value={signupInput.role}
+                  onChange={(e) => changeInputHandler(e, "signup")}
+                  className="w-full border p-2 rounded"
+                >
+                  <option value="student">Student</option>
+                  <option value="instructor">Instructor</option>
+                </select>
+
+                {signupInput.role === "instructor" && (
+                  <p className="text-sm text-yellow-600">
+                    Your account will need admin approval.
+                  </p>
+                )}
+              </div>
               <Button
                 disabled={registerIsLoading}
                 onClick={() => handleRegistration("signup")}
