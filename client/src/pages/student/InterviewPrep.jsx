@@ -38,14 +38,18 @@ const InterviewPrep = () => {
       let retries = 2;
 
       while (retries > 0) {
-        res = await fetch("http://localhost:8080/api/v1/interview/generate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        // "http://localhost:8080/api/v1/interview/generate"
+        res = await fetch(
+          `https://lms-aq-ip.onrender.com/api/v1/interview/generate`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({ topic, level }),
           },
-          credentials: "include",
-          body: JSON.stringify({ topic, level }),
-        });
+        );
 
         if (res.status === 503 || res.status === 429) {
           retries--;
@@ -75,9 +79,13 @@ const InterviewPrep = () => {
     setLoading(false);
   };
   const fetchHistory = async () => {
-    const res = await fetch("http://localhost:8080/api/v1/interview/history", {
-      credentials: "include",
-    });
+    //"http://localhost:8080/api/v1/interview/history"
+    const res = await fetch(
+      `https://lms-aq-ip.onrender.com/api/v1/interview/history`,
+      {
+        credentials: "include",
+      },
+    );
 
     const data = await res.json();
     setHistory(data.history);
@@ -101,19 +109,23 @@ const InterviewPrep = () => {
     }
 
     setEvaluating({ ...evaluating, [index]: true });
+    //"http://localhost:8080/api/v1/interview/evaluate"
 
-    const res = await fetch("http://localhost:8080/api/v1/interview/evaluate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const res = await fetch(
+      `https://lms-aq-ip.onrender.com/api/v1/interview/evaluate`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          question: question.question,
+          correctAnswer: question.answer,
+          userAnswer: answer,
+        }),
       },
-      credentials: "include",
-      body: JSON.stringify({
-        question: question.question,
-        correctAnswer: question.answer,
-        userAnswer: answer,
-      }),
-    });
+    );
 
     const data = await res.json();
 
