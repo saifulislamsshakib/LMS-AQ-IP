@@ -1,7 +1,7 @@
 import "./App.css";
 import { Toaster } from "sonner";
-import Login from "./pages/login.jsx";
-
+// import Login from "./pages/login.jsx";
+import Login from "./pages/Login.jsx";
 import Navbar from "./components/ui/Navbar";
 import HeroSection from "./pages/student/HeroSection";
 import MainLayout from "./layout/MainLayout";
